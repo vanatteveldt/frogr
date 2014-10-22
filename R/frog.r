@@ -12,16 +12,30 @@ library(tm)
 #' Note that if something is wrong, it is quite possible that this call will totall hang
 #' your R session as it is waiting for output on the socket, so use with caution!
 #' 
-#' @param text: The text to parse, may contain 
-#' @param terms: a vector of terms of length equal to docids
-#' @param freqs: an optional vector giving the frequency of terms
-#' @return an object of type DocumentTermMatrix (from the tm package)
+#' @param text: The texts to parse
+#' @param host: The hostname for the frog server
+#' @param port: The port the frog server is listening on
+#' @param verbose: If true, output a message for each document
+#' @return a data frame of tokens with columns for lemma, pos, etc 
 #' @export
-call_frog <- function(text, host="localhost", port=9772) {
+call_frog <- function(text, host="localhost", port=9772, verbose=T) {
   # establish connection and add finalizing code
   socket <- make.socket(host, port)
   on.exit(close.socket(socket))
   # call frog, ending with EOT
+  result <- NULL
+  for (i in 1:length(text)) {
+    t = text[i]
+    if (verbose) message("Frogging document ",i,": ", nchar(t), " characters")
+    tokens = do_call_frog(socket, t)
+    tokens$docid = i
+    result = rbind(result, tokens)
+  }
+  result[, c(ncol(result), ncol(result)-1, 1:(ncol(result)-2))]
+}
+
+#' Do the actual call to frog, returning the data frame
+do_call_frog <- function(socket, text) {
   write.socket(socket, text)
   write.socket(socket, "\nEOT\n")
   # read until 'READY' is found
@@ -40,7 +54,7 @@ call_frog <- function(text, host="localhost", port=9772) {
   firstword = rownames(result)[result$position == 1]
   result$sent[rownames(result) %in% firstword] = 1:length(firstword)
   result$sent = na.locf(result$sent)
-  result[, c(ncol(result), 1:(ncol(result)-1))]
+  result
 }
 
 #' Create a document term matrix from a token list
