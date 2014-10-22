@@ -2,9 +2,9 @@ Calling frog from R
 ========================================================
 
 Frog is a lemmatizer and dependency parser for Dutch which can also be run as a server.
-This package contains functions for connecting to a frog server from R and creating a document-term matrix from the resulting tokens. 
+This package contains functions for connecting to a frog server from R and creating a document-term matrix from the resulting tokens. Since this yields a standard `tm` term-document matrix, it can be used e.g. for [corpus analysis](https://github.com/kasperwelbers/corpus-tools/blob/master/howto/howto_compare_corpora.md),  [topic modeling](https://github.com/kasperwelbers/corpus-tools/blob/master/howto/howto_latent_dirichlet_allocation_topmod.md), or machine learning using [RTextTools](http://www.rtexttools.net)
 
-See http://ilk.uvt.nl/frog/ for more information.
+See http://ilk.uvt.nl/frog/ for more information on Frog.
 
 Installing and running the frog server
 ----
@@ -127,4 +127,5 @@ as.matrix(m)
 ##    1      1      2   3
 ```
 
-As you can see, all forms of cat (_kat_, _katten_, _katjes_), love (_houdt_, _houden_), and have (_heeft_) are properly lemmatized
+As you can see, all forms of cat (_kat_, _katten_, _katjes_), love (_houdt_, _houden_), and have (_heeft_) are properly lemmatized.
+
