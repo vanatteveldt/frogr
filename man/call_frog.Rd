@@ -3,17 +3,19 @@
 \alias{call_frog}
 \title{Call a frog (Dutch lemmatizer and dependency parser) instance running in daemon mode}
 \usage{
-call_frog(text, host = "localhost", port = 9772)
+call_frog(text, host = "localhost", port = 9772, verbose = T)
 }
 \arguments{
-\item{text:}{The text to parse, may contain}
+\item{text:}{The text(s) to parse}
 
-\item{terms:}{a vector of terms of length equal to docids}
+\item{host:}{The hostname for the frog server}
 
-\item{freqs:}{an optional vector giving the frequency of terms}
+\item{port:}{The port the frog server is listening on}
+
+\item{verbose:}{If true, output a message for each document}
 }
 \value{
-an object of type DocumentTermMatrix (from the tm package)
+a data frame of tokens with columns for lemma, pos, etc
 }
 \description{
 See http://ilk.uvt.nl/frog/
@@ -22,7 +24,9 @@ $ sudo apt-get install frog frogdata ucto
 $ frog -S 9772
 }
 \details{
-Note that if something is wrong, it is quite possible that this call will totall hang
+A separate call to frog is made for each text in the text input vector.
+
+Note that if something is wrong, it is quite possible that this function will totall hang
 your R session as it is waiting for output on the socket, so use with caution!
 }
 

@@ -9,10 +9,12 @@ library(tm)
 #' $ sudo apt-get install frog frogdata ucto
 #' $ frog -S 9772
 #' 
-#' Note that if something is wrong, it is quite possible that this call will totall hang
+#' A separate call to frog is made for each text in the text input vector.
+#' 
+#' Note that if something is wrong, it is quite possible that this function will totall hang
 #' your R session as it is waiting for output on the socket, so use with caution!
 #' 
-#' @param text: The texts to parse
+#' @param text: The text(s) to parse
 #' @param host: The hostname for the frog server
 #' @param port: The port the frog server is listening on
 #' @param verbose: If true, output a message for each document
