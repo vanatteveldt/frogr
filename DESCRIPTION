@@ -1,0 +1,13 @@
+Package: frogr
+Version: 0.100
+Date: 2014-10-22
+Title: R client for the frog tagger and parser for Dutch 
+Author: Wouter van Atteveldt 
+Maintainer: Wouter van Atteveldt <wouter@vanatteveldt.com>
+Depends:
+    zoo,
+    Matrix,
+    tm
+Description: Functions to call a frog server and create a document term matrix
+License: MIT
+URL: http://github.com/vanatteveldt/frogr
