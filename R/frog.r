@@ -53,8 +53,7 @@ do_call_frog <- function(socket, text) {
                         "ner", "chunk", "parse1", "parse2")
   result$majorpos = gsub("\\(.*", "", result$pos)
   # assign sentence number by assigning number when position == 1 and filling down into NA cells using zoo::na.locf
-  firstword = rownames(result)[result$position == 1]
-  result$sent[rownames(result) %in% firstword] = 1:length(firstword)
+  result$sent[result$position == 1] = 1:sum(result$position == 1)
   result$sent = na.locf(result$sent)
   result
 }
@@ -76,7 +75,7 @@ create_dtm <- function(docs, terms, freqs=rep(1, length(terms)), weighting=weigh
                 match(d$doc, docnames), match(d$term, termnames), d$freq)
   rownames(sm) = docnames
   colnames(sm) = termnames
-  as.DocumentTermMatrix(sm, weighting=weighting)
+  as.DocumentTermMatrix(sm, weighting=weighting)
 }
 
 result = call_frog("Een zin is een test. Maar nog een zin?\nEven Apeldoorn bellen!")
