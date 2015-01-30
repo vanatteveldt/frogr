@@ -48,13 +48,16 @@ do_call_frog <- function(socket, text) {
   output = gsub("READY\n$", "", output)
   # read output and label columns
   con <- textConnection(output)
-  result = read.table(con, header=F, sep="\t")
+  result = read.csv(con, sep='\t', header=F)
   colnames(result) <- c("position", "word", "lemma", "morph", "pos", "prob",
                         "ner", "chunk", "parse1", "parse2")
   result$majorpos = gsub("\\(.*", "", result$pos)
+  
   # assign sentence number by assigning number when position == 1 and filling down into NA cells using zoo::na.locf
   result$sent[result$position == 1] = 1:sum(result$position == 1)
+  if(is.na(result$sent[1])) result$sent[1] = 1
   result$sent = na.locf(result$sent)
+  
   result
 }
 
@@ -75,17 +78,7 @@ create_dtm <- function(docs, terms, freqs=rep(1, length(terms)), weighting=weigh
                 match(d$doc, docnames), match(d$term, termnames), d$freq)
   rownames(sm) = docnames
   colnames(sm) = termnames
-  as.DocumentTermMatrix(sm, weighting=weighting)
+  as.DocumentTermMatrix(sm, weighting=weighting)
 }
 
-result = call_frog("Een zin is een test. Maar nog een zin?\nEven Apeldoorn bellen!")
-docs = result$sent
-terms = result$lemma
-freqs=rep(1, length(terms))
 
-m = create_dtm(result$sent, result$lemma)
-as.matrix(m)
-
-nouns = result[result$majorpos == "N", ]
-m = create_dtm(nouns$sent, nouns$lemma)
-as.matrix(m)
