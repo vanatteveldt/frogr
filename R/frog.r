@@ -49,6 +49,7 @@ do_call_frog <- function(socket, text) {
   # read output and label columns
   con <- textConnection(output)
   result = read.csv(con, sep='\t', header=F)
+  close(con)
   colnames(result) <- c("position", "word", "lemma", "morph", "pos", "prob",
                         "ner", "chunk", "parse1", "parse2")
   result$majorpos = gsub("\\(.*", "", result$pos)
