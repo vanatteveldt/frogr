@@ -28,6 +28,7 @@ call_frog <- function(text, host="localhost", port=9772, verbose=T) {
   result <- NULL
   for (i in 1:length(text)) {
     t = text[i]
+    if(nchar(t) == 0) next
     if (verbose) message("Frogging document ",i,": ", nchar(t), " characters")
     tokens = do_call_frog(socket, t)
     tokens$docid = i
@@ -48,10 +49,13 @@ do_call_frog <- function(socket, text) {
   output = gsub("READY\n$", "", output)
   # read output and label columns
   con <- textConnection(output)
-  result = read.csv(con, sep='\t', header=F)
+  
+  result = read.csv(con, sep='\t', quote = '', header=F)
+  
   colnames(result) <- c("position", "word", "lemma", "morph", "pos", "prob",
                         "ner", "chunk", "parse1", "parse2")
   result$majorpos = gsub("\\(.*", "", result$pos)
+  
   
   # assign sentence number by assigning number when position == 1 and filling down into NA cells using zoo::na.locf
   result$sent[result$position == 1] = 1:sum(result$position == 1)
@@ -80,5 +84,3 @@ create_dtm <- function(docs, terms, freqs=rep(1, length(terms)), weighting=weigh
   colnames(sm) = termnames
   as.DocumentTermMatrix(sm, weighting=weighting)
 }
-
-
