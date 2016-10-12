@@ -1,6 +1,7 @@
 library(zoo)
 library(Matrix)
 library(tm)
+library(plyr)
 
 #' Call a frog (Dutch lemmatizer and dependency parser) instance running in daemon mode
 #' 
@@ -25,15 +26,17 @@ call_frog <- function(text, host="localhost", port=9772, verbose=T) {
   socket <- make.socket(host, port)
   on.exit(close.socket(socket))
   # call frog, ending with EOT
-  result <- NULL
+
+  result <- vector("list", length(text))
   for (i in 1:length(text)) {
     t = text[i]
     if(nchar(t) == 0) next
     if (verbose) message("Frogging document ",i,": ", nchar(t), " characters")
     tokens = do_call_frog(socket, t)
     tokens$docid = i
-    result = rbind(result, tokens)
+    result[[i]] = tokens
   }
+  result = rbind.fill(result)
   result[, c(ncol(result), ncol(result)-1, 1:(ncol(result)-2))]
 }
 
@@ -47,15 +50,15 @@ do_call_frog <- function(socket, text) {
     output = paste(output, read.socket(socket), sep="")  
   }
   output = gsub("READY\n$", "", output)
+  
   # read output and label columns
   con <- textConnection(output)
-  
   result = read.csv(con, sep='\t', quote = '', header=F)
+  close(con)
   
   colnames(result) <- c("position", "word", "lemma", "morph", "pos", "prob",
                         "ner", "chunk", "parse1", "parse2")
   result$majorpos = gsub("\\(.*", "", result$pos)
-  
   
   # assign sentence number by assigning number when position == 1 and filling down into NA cells using zoo::na.locf
   result$sent[result$position == 1] = 1:sum(result$position == 1)
